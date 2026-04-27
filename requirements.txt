@@ -3,7 +3,8 @@ pywin32==311
 pyttsx3==2.90
 SpeechRecognition==3.10.0
 google-genai==1.73.1
-elevenlabs==0.2.2
+elevenlabs>=0.3.0
+pydantic>=2.0.0
 python-dotenv==1.0.0
 langdetect==1.0.9
 requests==2.31.0

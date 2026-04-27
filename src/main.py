@@ -20,7 +20,7 @@ from config.config import (
     GOOGLE_API_KEY, ELEVENLABS_API_KEY, SYSTEM_PROMPT,
     USE_VOICE_INPUT, USE_VOICE_OUTPUT, ALLOWED_APPS,
     LOG_FILE, LOG_LEVEL, AI_MODEL, ASSISTANT_NAME, ASSISTANT_VERSION,
-    DATA_FILE, ELEVENLABS_VOICE_ID, validate_api_keys
+    DATA_FILE, ELEVENLABS_VOICE_ID, validate_api_keys, update_env_variable
 )
 from modules.language_detector import LanguageDetector
 from modules.ai_processor import AIProcessor
@@ -62,17 +62,20 @@ class DianaAssistant:
         self.command_processor = CommandProcessor(allowed_apps=ALLOWED_APPS)
         
         # Initialize voice if API key is available
+        self.voice_handler = None
         if USE_VOICE_OUTPUT and ELEVENLABS_API_KEY:
             try:
                 self.voice_handler = VoiceHandler(
                     api_key=ELEVENLABS_API_KEY,
                     voice_id=ELEVENLABS_VOICE_ID
                 )
+                # Check if voice handler was initialized successfully
+                if self.voice_handler.client is None:
+                    logger.warning("Voice handler not fully initialized, voice output disabled")
+                    self.voice_handler = None
             except Exception as e:
                 logger.warning(f"Voice handler initialization failed: {e}")
                 self.voice_handler = None
-        else:
-            self.voice_handler = None
         
         self.running = True
         logger.info(f"{self.assistant_name} initialized successfully")
@@ -108,22 +111,39 @@ class DianaAssistant:
         
         print(f"{Fore.BLUE}[Detected: {lang_name} ({confidence:.0%})]{Style.RESET_ALL}")
         
-        # Check for name-related questions (Spanish & English)
         user_lower = user_input.lower().strip()
-        name_keywords = ["what is your name", "who are you", "what's your name", "your name",
-                         "cuál es tu nombre", "quién eres", "cómo te llamas", "tu nombre"]
-        change_name_keywords = ["change my name", "change name to", "rename me", "call me",
-                               "cambia mi nombre", "renombra", "llámame", "cambiar nombre a"]
+        
+        # ==================== CHECK FOR NAME-RELATED QUERIES ====================
+        # Keywords for asking about the assistant's name
+        name_question_keywords = [
+            # English
+            "what is your name", "what's your name", "who are you", "who am i talking to",
+            "tell me your name", "your name", "what do you call yourself", "what name do you have",
+            # Spanish
+            "cuál es tu nombre", "cual es tu nombre", "quién eres", "quien eres", 
+            "cómo te llamas", "como te llamas", "dime tu nombre", "tu nombre",
+            "cuál es mi nombre", "cual es mi nombre"
+        ]
         
         # Check if asking for name
-        if any(keyword in user_lower for keyword in name_keywords):
-            response = f"My name is {self.assistant_name}. I am a virtual assistant powered by Google Gemini and ElevenLabs."
+        if any(keyword in user_lower for keyword in name_question_keywords):
+            response = f"My name is {self.assistant_name}. I am a virtual assistant powered by Google Gemini and ElevenLabs. You can change my name anytime by saying 'call me [new name]'."
             print(f"{Fore.CYAN}{self.assistant_name}: {response}{Style.RESET_ALL}")
             if USE_VOICE_OUTPUT and self.voice_handler:
                 self.voice_handler.speak(response)
             return
         
-        # Check if changing name
+        # ==================== CHECK FOR NAME CHANGE COMMANDS ====================
+        # Keywords for changing the assistant's name
+        change_name_keywords = [
+            # English
+            "call me", "rename me", "change my name to", "change name to", "i want to call you",
+            "you can call me", "call yourself", "rename yourself", "my name is",
+            # Spanish
+            "llámame", "llamame", "cambia mi nombre", "renombra", "cambiar nombre a",
+            "puedes llamarme", "quiero llamarte", "te voy a llamar"
+        ]
+        
         change_name_match = None
         for keyword in change_name_keywords:
             if keyword in user_lower:
@@ -135,23 +155,43 @@ class DianaAssistant:
             idx = user_lower.find(change_name_match)
             potential_name = user_input[idx + len(change_name_match):].strip()
             
-            # Clean up the name (remove common words)
+            # Clean up the name
             if potential_name:
-                # Remove trailing punctuation and common words
-                potential_name = potential_name.rstrip('.!?,;')
+                # Remove trailing punctuation
+                potential_name = potential_name.rstrip('.!?,;:')
                 
-                if potential_name and len(potential_name) > 0:
+                # Remove common words at the beginning
+                common_prefixes = ["the ", "a ", "my ", "your ", "the name ", "you ", "me "]
+                for prefix in common_prefixes:
+                    if potential_name.lower().startswith(prefix):
+                        potential_name = potential_name[len(prefix):].strip()
+                
+                # Ensure name is not empty and reasonable length (2-50 characters)
+                if potential_name and 2 <= len(potential_name) <= 50:
                     old_name = self.assistant_name
                     self.assistant_name = potential_name
-                    response = f"Thank you for renaming me! I am now called {self.assistant_name}. My previous name was {old_name}."
+                    
+                    # Update .env file
+                    success = update_env_variable("ASSISTANT_NAME", self.assistant_name)
+                    
+                    if success:
+                        response = f"Thank you! You can now call me {self.assistant_name}. I will remember this name. My previous name was {old_name}."
+                        logger.info(f"Assistant name changed from '{old_name}' to '{self.assistant_name}' (saved to .env)")
+                    else:
+                        response = f"I've updated my name to {self.assistant_name} in this session, but I couldn't save it permanently. Please try again."
+                        logger.warning(f"Failed to save new name '{self.assistant_name}' to .env file")
+                    
                     print(f"{Fore.CYAN}{self.assistant_name}: {response}{Style.RESET_ALL}")
-                    logger.info(f"Assistant name changed from '{old_name}' to '{self.assistant_name}'")
                     if USE_VOICE_OUTPUT and self.voice_handler:
                         self.voice_handler.speak(response)
                     return
+                else:
+                    response = "The name you provided is too short or too long. Please try again with a name between 2 and 50 characters."
+                    print(f"{Fore.CYAN}{self.assistant_name}: {response}{Style.RESET_ALL}")
+                    return
             
             # If no valid name extracted
-            response = "I didn't catch your new name. Please try again with 'call me [new name]'"
+            response = "I didn't catch your new name. Please try again with 'call me [new name]' or 'rename me to [new name]'"
             print(f"{Fore.CYAN}{self.assistant_name}: {response}{Style.RESET_ALL}")
             return
         
@@ -163,27 +203,27 @@ class DianaAssistant:
             result = self.command_processor.execute_command(parsed_command)
             if result.get("success"):
                 response = result.get("message", "Command executed")
-                print(f"{Fore.CYAN}Diana: {response}{Style.RESET_ALL}")
+                print(f"{Fore.CYAN}{self.assistant_name}: {response}{Style.RESET_ALL}")
             else:
                 response = result.get("message", "Could not execute command")
-                print(f"{Fore.RED}Diana: {response}{Style.RESET_ALL}")
+                print(f"{Fore.RED}{self.assistant_name}: {response}{Style.RESET_ALL}")
         
         elif parsed_command["type"] == "close":
             result = self.command_processor.execute_command(parsed_command)
             response = result.get("message", "Command executed")
-            print(f"{Fore.CYAN}Diana: {response}{Style.RESET_ALL}")
+            print(f"{Fore.CYAN}{self.assistant_name}: {response}{Style.RESET_ALL}")
         
         elif parsed_command["type"] == "help":
             result = self.command_processor.execute_command(parsed_command)
-            print(f"{Fore.CYAN}Diana: {result.get('message')}{Style.RESET_ALL}")
+            print(f"{Fore.CYAN}{self.assistant_name}: {result.get('message')}{Style.RESET_ALL}")
         
         elif parsed_command["type"] == "list":
             result = self.command_processor.execute_command(parsed_command)
-            print(f"{Fore.CYAN}Diana: {result.get('message')}{Style.RESET_ALL}")
+            print(f"{Fore.CYAN}{self.assistant_name}: {result.get('message')}{Style.RESET_ALL}")
         
         elif parsed_command["type"] == "exit":
             self.running = False
-            print(f"{Fore.CYAN}Diana: Goodbye! Have a great day!{Style.RESET_ALL}")
+            print(f"{Fore.CYAN}{self.assistant_name}: Goodbye! Have a great day!{Style.RESET_ALL}")
         
         else:
             # Process as natural language query with AI
@@ -191,14 +231,14 @@ class DianaAssistant:
             
             if ai_response["success"]:
                 response_text = ai_response["content"]
-                print(f"{Fore.CYAN}Diana: {response_text}{Style.RESET_ALL}")
+                print(f"{Fore.CYAN}{self.assistant_name}: {response_text}{Style.RESET_ALL}")
                 
                 # Speak response if voice output is enabled
                 if USE_VOICE_OUTPUT and self.voice_handler:
                     self.voice_handler.speak(response_text)
             else:
                 error_msg = ai_response.get("error", "Unknown error")
-                print(f"{Fore.RED}Diana: Error processing request: {error_msg}{Style.RESET_ALL}")
+                print(f"{Fore.RED}{self.assistant_name}: Error processing request: {error_msg}{Style.RESET_ALL}")
     
     def run(self):
         """Main run loop"""
@@ -223,7 +263,7 @@ class DianaAssistant:
             self.ai_processor.save_history(DATA_FILE)
         
         logger.info("Diana assistant stopped")
-        print(f"\n{Fore.YELLOW}Thank you for using {ASSISTANT_NAME}!{Style.RESET_ALL}")
+        print(f"\n{Fore.YELLOW}Thank you for using {self.assistant_name}!{Style.RESET_ALL}")
     
     def test_setup(self):
         """Test the assistant setup"""

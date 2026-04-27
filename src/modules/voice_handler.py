@@ -3,10 +3,17 @@ Voice handling module for Diana
 Manages text-to-speech with ElevenLabs API
 """
 import logging
-from elevenlabs.client import ElevenLabs
-from elevenlabs import play
 
 logger = logging.getLogger(__name__)
+
+# Try to import elevenlabs, but make it optional
+try:
+    from elevenlabs.client import ElevenLabs
+    ELEVENLABS_AVAILABLE = True
+except Exception as e:
+    logger.warning(f"ElevenLabs not available: {e}")
+    ELEVENLABS_AVAILABLE = False
+    ElevenLabs = None
 
 class VoiceHandler:
     """Handle voice input/output with ElevenLabs"""
@@ -19,11 +26,21 @@ class VoiceHandler:
             api_key (str): ElevenLabs API key
             voice_id (str): ElevenLabs voice ID to use
         """
-        self.api_key = api_key
-        self.voice_id = voice_id
-        self.client = ElevenLabs(api_key=api_key)
+        if not ELEVENLABS_AVAILABLE:
+            logger.warning("ElevenLabs library not available. Voice synthesis disabled.")
+            self.client = None
+            self.api_key = None
+            self.voice_id = None
+            return
         
-        logger.info(f"Voice Handler initialized with voice ID: {voice_id}")
+        try:
+            self.api_key = api_key
+            self.voice_id = voice_id
+            self.client = ElevenLabs(api_key=api_key)
+            logger.info(f"Voice Handler initialized with voice ID: {voice_id}")
+        except Exception as e:
+            logger.warning(f"Failed to initialize ElevenLabs client: {e}")
+            self.client = None
     
     def speak(self, text, auto_play=True):
         """
@@ -36,6 +53,13 @@ class VoiceHandler:
         Returns:
             dict: Audio data and metadata
         """
+        if not self.client:
+            logger.debug("Voice handler not available, skipping speech synthesis")
+            return {
+                "success": False,
+                "error": "Voice handler not initialized"
+            }
+        
         try:
             if not text or len(text.strip()) == 0:
                 logger.warning("Empty text provided for speech")
@@ -109,7 +133,7 @@ class VoiceHandler:
             "EXAVITQu4vr4xnSDxMaL": {"name": "Rachel", "gender": "Female", "accent": "American"},
             "nPczCjzI2devNBz1zQrb": {"name": "Brian", "gender": "Male", "accent": "American"},
             "9BWtsMINqrJLrRacOk9Q": {"name": "Aria", "gender": "Female", "accent": "American"},
-            "EXAVITQu4vr4xnSDxMaL": {"name": "Sarah", "gender": "Female", "accent": "British"},
+            "XB0fDUnXU5powFXDhCwa": {"name": "Sarah", "gender": "Female", "accent": "British"},
             "LFSE5hU29RdP8lSMZYdP": {"name": "Bella", "gender": "Female", "accent": "American"}
         }
         return voices

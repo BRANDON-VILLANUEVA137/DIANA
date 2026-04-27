@@ -85,3 +85,55 @@ def validate_api_keys():
         print("⚠️  WARNING: ELEVENLABS_API_KEY not set. Voice output disabled.")
         return False
     return True
+
+
+def update_env_variable(variable_name, value):
+    """
+    Update or create an environment variable in .env file
+    
+    Args:
+        variable_name (str): Name of the variable
+        value (str): New value for the variable
+        
+    Returns:
+        bool: True if successful, False otherwise
+    """
+    try:
+        from pathlib import Path
+        
+        # Get the path to .env file (parent directory of this config file)
+        env_path = Path(__file__).parent.parent.parent / ".env"
+        
+        # Read current .env content
+        if env_path.exists():
+            with open(env_path, 'r', encoding='utf-8') as f:
+                lines = f.readlines()
+        else:
+            lines = []
+        
+        # Update or add the variable
+        variable_found = False
+        updated_lines = []
+        
+        for line in lines:
+            if line.startswith(f"{variable_name}="):
+                updated_lines.append(f"{variable_name} = {value}\n")
+                variable_found = True
+            else:
+                updated_lines.append(line)
+        
+        # Add variable if it doesn't exist
+        if not variable_found:
+            updated_lines.append(f"\n{variable_name} = {value}\n")
+        
+        # Write updated content back to .env
+        with open(env_path, 'w', encoding='utf-8') as f:
+            f.writelines(updated_lines)
+        
+        return True
+        
+    except Exception as e:
+        import logging
+        logger = logging.getLogger(__name__)
+        logger.error(f"Error updating .env file: {e}")
+        return False

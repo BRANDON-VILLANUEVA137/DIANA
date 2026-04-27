@@ -15,7 +15,72 @@ Tu asistente virtual **Diana** está **completamente implementado y funcional**.
 ✅ Manejo robusto de errores
 ✅ Logging completo
 ✅ Documentación detallada
+✅ Responde su nombre cuando se lo preguntan
+✅ Permite cambiar su nombre con un comando de voz
+✅ Persiste el cambio de nombre en el archivo .env
 ```
+
+---
+
+## 🎤 Nuevas Características - Gestión del Nombre
+
+### 1️⃣ Preguntar el Nombre de Diana
+
+Puedes preguntarle su nombre de varias formas:
+
+**En Inglés:**
+- "What is your name?"
+- "What's your name?"
+- "Who are you?"
+- "Tell me your name"
+
+**En Español:**
+- "¿Cuál es tu nombre?"
+- "¿Quién eres?"
+- "¿Cómo te llamas?"
+- "Dime tu nombre"
+
+**Diana responderá:**
+> "My name is D-I-03367. I am a virtual assistant powered by Google Gemini and ElevenLabs. You can change my name anytime by saying 'call me [new name]'."
+
+### 2️⃣ Cambiar el Nombre de Diana
+
+Puedes cambiar el nombre de Diana de varias formas:
+
+**En Inglés:**
+- "Call me [nuevo nombre]"
+- "Rename me to [nuevo nombre]"
+- "My name is [nuevo nombre]"
+
+**En Español:**
+- "Llámame [nuevo nombre]"
+- "Renombra a [nuevo nombre]"
+- "Cambia mi nombre a [nuevo nombre]"
+
+**Ejemplo:**
+```
+You: Call me ALEX
+Diana: Thank you! You can now call me ALEX. I will remember this name. 
+       My previous name was D-I-03367.
+```
+
+**Características del cambio de nombre:**
+- ✅ Se guarda automáticamente en el archivo `.env`
+- ✅ Persiste en futuras sesiones
+- ✅ Se valida que tenga entre 2 y 50 caracteres
+- ✅ Diana te confirma el cambio con voz
+
+### 3️⃣ Variable de Entorno VOICE_ID
+
+Tu variable de entorno `VOICE_ID` está configurada con:
+```
+VOICE_ID = XJ2fW4ybq7HouelYYGcL
+```
+
+Esta variable controla la voz que usa ElevenLabs para hablar. Puedes cambiarla a:
+- `EXAVITQu4vr4xnSDxMaL` - Rachel (femenino)
+- `nPczCjzI2devNBz1zQrb` - Brian (masculino)
+- `9BWtsMINqrJLrRacOk9Q` - Aria (femenino)
 
 ---
 

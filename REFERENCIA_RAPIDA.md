@@ -24,6 +24,21 @@ python src/main.py
 
 ## 📋 LISTA DE COMANDOS DISPONIBLES
 
+### 🎤 Comandos Especiales - Nombre del Asistente
+```
+¿Cuál es tu nombre?           → Diana responde su nombre actual
+Quién eres?                   → Diana responde su identidad
+What is your name?            → Diana tells you her current name (English)
+
+Llámame [nuevo nombre]        → Cambia el nombre de Diana
+Renombra a [nuevo nombre]     → Cambia el nombre de Diana
+Call me [new name]            → Changes Diana's name (English)
+```
+
+**Nota:** El nuevo nombre se guarda automáticamente en el archivo `.env` y persistirá en futuras sesiones.
+
+**Nombre inicial:** `D-I-03367`
+
 ### Aplicaciones
 ```
 abre <app>          → Abre una aplicación (ej: "abre chrome")

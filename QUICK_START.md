@@ -37,6 +37,36 @@ python src/main.py --test
 
 ## 💬 Ejemplos de Uso
 
+### Preguntar el Nombre de Diana
+
+```
+You: What is your name?
+[Detected: English (98%)]
+Diana: My name is D-I-03367. I am a virtual assistant powered by Google Gemini and ElevenLabs. 
+       You can change my name anytime by saying 'call me [new name]'.
+
+You: ¿Cuál es tu nombre?
+[Detected: Spanish (99%)]
+Diana: My name is D-I-03367. I am a virtual assistant powered by Google Gemini and ElevenLabs. 
+       You can change my name anytime by saying 'call me [new name]'.
+```
+
+### Cambiar el Nombre de Diana
+
+```
+You: Call me ALEXA
+[Detected: English (97%)]
+ALEXA: Thank you! You can now call me ALEXA. I will remember this name. 
+       My previous name was D-I-03367.
+
+You: Llámame ASISTENTE
+[Detected: Spanish (98%)]
+ASISTENTE: Thank you! You can now call me ASISTENTE. I will remember this name. 
+           My previous name was D-I-03367.
+```
+
+**Nota:** El cambio de nombre se guarda automáticamente en el archivo `.env` y persistirá en futuras sesiones.
+
 ### Entrada en Español → Respuesta en Inglés
 
 ```
