@@ -18,7 +18,7 @@ except Exception as e:
 class VoiceHandler:
     """Handle voice input/output with ElevenLabs"""
     
-    def __init__(self, api_key, voice_id="EXAVITQu4vr4xnSDxMaL"):
+    def __init__(self, api_key, voice_id="XJ2fW4ybq7HouelYYGcL"):
         """
         Initialize Voice Handler
         
@@ -74,7 +74,7 @@ class VoiceHandler:
             audio = self.client.text_to_speech.convert(
                 text=text,
                 voice_id=self.voice_id,
-                model_id="eleven_monolingual_v1"
+                model_id="eleven_multilingual_v2"
             )
             
             # Convert audio stream to bytes

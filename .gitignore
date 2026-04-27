@@ -1,3 +1,4 @@
 .env
 ai-assistant/logs/
 *.log
+.Cconversation_history.json

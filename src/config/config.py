@@ -20,7 +20,7 @@ INPUT_LANGUAGES = ["es", "en"]  # Accept both languages as input
 USE_VOICE_INPUT = False  # Set to True to enable voice input
 USE_VOICE_OUTPUT = True  # Set to True to enable voice output
 VOICE_SPEED = 1.0  # Voice speed (0.5 - 2.0)
-ELEVENLABS_VOICE_ID = os.getenv("VOICE_ID", "EXAVITQu4vr4xnSDxMaL")  # Default voice ID (Rachel)
+ELEVENLABS_VOICE_ID = os.getenv("VOICE_ID", "XJ2fW4ybq7HouelYYGcL")  # Default voice ID
 
 # Alternative voice IDs from ElevenLabs:
 # - "EXAVITQu4vr4xnSDxMaL" - Rachel (female)
