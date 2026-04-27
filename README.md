@@ -17,8 +17,8 @@ python src/main.py
 
 ### 3. Prueba Básica
 Una vez ejecutado, prueba estos comandos:
-- `abre notepad` → Abre el Notepad
-- `abre calculator` → Abre la Calculadora
+- `abre block` → Abre el Notepad
+- `abre calculadora` → Abre la Calculadora
 - `ventanas` → Lista ventanas abiertas
 - `ayuda` → Muestra comandos disponibles
 - `salir` → Cierra el asistente
@@ -87,11 +87,11 @@ ALLOWED_APPS = {
 
 | Comando | Alias | Descripción | Ejemplo |
 |---------|-------|-------------|---------|
-| `open` | abre, abrir | Abre una aplicación | `abre chrome` |
-| `close` | cierra, cerrar | Cierra una aplicación | `cierra notepad` |
+| `open` | abre, abrir | Abre una aplicación | `abre microsoft edge` |
+| `close` | cierra, cerrar | Cierra una aplicación | `cierra block` |
 | `window_list` | ventanas | Lista ventanas abiertas | `ventanas` |
-| `bring_to_front` | trae, muestra | Trae ventana al frente | `trae chrome` |
-| `minimize` | minimiza | Minimiza una ventana | `minimiza calculator` |
+| `bring_to_front` | trae, muestra | Trae ventana al frente | `trae microsoft edge` |
+| `minimize` | minimiza | Minimiza una ventana | `minimiza calculadora` |
 | `help` | ayuda | Muestra ayuda | `ayuda` |
 
 ---
