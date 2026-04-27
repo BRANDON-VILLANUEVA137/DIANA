@@ -1,81 +1,125 @@
-# Asistente de IA Local - Diana
+# 🤖 Diana - Virtual Assistant with Multi-Language Support
 
-Un asistente de IA funcional, local y extensible para automatizar tareas en Windows, Linux y macOS.
+Un asistente de IA inteligente que entiende español e inglés y responde siempre en inglés, impulsado por Google Gemini y ElevenLabs.
+
+### ✨ Características Principales
+- 🌐 **Multi-Idioma**: Entiende español e inglés automáticamente
+- 🎯 **IA Avanzada**: Usa Google Gemini 2.0 Flash para procesamiento natural
+- 🎙️ **Síntesis de Voz**: ElevenLabs para respuestas de audio realistas
+- ⚡ **Comandos**: Abre/cierra aplicaciones con órdenes naturales
+- 📚 **Contexto**: Mantiene memoria de conversaciones
+- 📝 **Historial**: Guarda conversaciones para análisis
 
 ## 🚀 Inicio Rápido
 
-### 1. Instalación de Dependencias
-```bash
-cd ai-assistant
+### 1. Clonar y Configurar
+```powershell
+# Navegar al proyecto
+cd c:\Users\USUARIO\Desktop\DIANA
+
+# Copiar configuración
+Copy-Item .env.example .env
+
+# Editar .env con tus API keys (Google Gemini + ElevenLabs)
+```
+
+### 2. Instalar Dependencias
+```powershell
+# Activar entorno virtual
+.\.venv\Scripts\Activate.ps1
+
+# Instalar paquetes
 pip install -r requirements.txt
 ```
 
-### 2. Ejecución Inicial
-```bash
+### 3. Ejecutar Diana
+```powershell
+# Ejecución normal
 python src/main.py
+
+# Test de configuración
+python src/main.py --test
+
+# Test completo
+python test_diana.py
 ```
 
-### 3. Prueba Básica
-Una vez ejecutado, prueba estos comandos:
-- `abre block` → Abre el Notepad
-- `abre calculadora` → Abre la Calculadora
-- `ventanas` → Lista ventanas abiertas
-- `ayuda` → Muestra comandos disponibles
-- `salir` → Cierra el asistente
+### 4. Ejemplos de Uso
+```
+You: ¿Cuál es la capital de Francia?
+[Detected: Spanish (95%)]
+Diana: The capital of France is Paris, a beautiful city in north-central France...
+
+You: open notepad
+[Detected: English (99%)]
+Diana: Opened Text editor
+
+You: help
+Diana: Available Commands: open, close, list, help, exit
+```
 
 ---
 
 ## 📂 Estructura del Proyecto
 
 ```
-ai-assistant/
-│
-├── docs/
-│   └── ARQUITECTURA.md          # Documentación completa de arquitectura
-│
+DIANA/
 ├── src/
-│   ├── main.py                  # Script principal (punto de entrada)
-│   │
+│   ├── main.py                              # Punto de entrada principal
 │   ├── config/
-│   │   └── config.py            # Configuración centralizada
-│   │
+│   │   └── config.py                        # Configuración centralizada
 │   └── modules/
-│       ├── app_launcher.py      # Búsqueda y ejecución de apps
-│       ├── window_manager.py    # Gestión de ventanas
-│       ├── command_processor.py # Parse de comandos
-│       └── input_handler.py     # Entrada de voz/texto
+│       ├── language_detector.py             # Detección de idioma
+│       ├── ai_processor.py                  # Google Gemini integration
+│       ├── voice_handler.py                 # ElevenLabs voice synthesis
+│       └── command_processor.py             # Command parsing & execution
 │
-├── logs/                         # Logs de ejecución (generado automáticamente)
-├── data/                         # Datos y historial (generado automáticamente)
+├── logs/                                    # Archivos de log
+├── data/                                    # Historial de conversaciones
 │
-├── requirements.txt             # Dependencias Python
-└── README.md                    # Este archivo
+├── requirements.txt                         # Dependencias Python
+├── .env.example                             # Configuración de ejemplo
+├── README.md                                # Este archivo
+├── QUICK_START.md                           # Guía rápida
+├── DOCUMENTATION.md                         # Documentación completa
+├── test_diana.py                            # Suite de pruebas
+└── .gitignore                               # Archivos a ignorar en git
 ```
 
 ---
 
 ## ⚙️ Configuración
 
-Editar `src/config/config.py` para:
+### Variables de Entorno (.env)
+```env
+# Google Gemini API
+GOOGLE_API_KEY=your_api_key_here
 
-### Habilitar Input de Voz
-```python
-USE_VOICE_INPUT = True   # Cambiar a True
+# ElevenLabs API (opcional, para síntesis de voz)
+ELEVENLABS_API_KEY=your_api_key_here
 ```
 
-### Habilitar Output de Voz
+### Opciones en config.py
+
+#### Idiomas de Entrada
 ```python
-USE_VOICE_OUTPUT = True  # Cambiar a True
-VOICE_LANGUAGE = "es-ES" # Idioma
+INPUT_LANGUAGES = ["es", "en"]  # Spanish and English
+OUTPUT_LANGUAGE = "en"           # Always English output
 ```
 
-### Agregar Aplicaciones Permitidas
+#### Síntesis de Voz
+```python
+USE_VOICE_OUTPUT = False         # Set to True to enable
+ELEVENLABS_VOICE_ID = "EXAVITQu4vr4xnSDxMaL"  # Rachel (default)
+```
+
+#### Aplicaciones Permitidas
 ```python
 ALLOWED_APPS = {
-    "mi_app": {
-        "paths": [r"C:\Ruta\a\mi_app.exe"],
-        "aliases": ["app"],
-        "description": "Mi aplicación"
+    "notepad": {
+        "paths": [r"C:\Windows\System32\notepad.exe"],
+        "aliases": ["block", "editor"],
+        "description": "Text editor"
     },
     ...
 }
@@ -85,18 +129,88 @@ ALLOWED_APPS = {
 
 ## 🎮 Comandos Disponibles
 
-| Comando | Alias | Descripción | Ejemplo |
-|---------|-------|-------------|---------|
-| `open` | abre, abrir | Abre una aplicación | `abre microsoft edge` |
-| `close` | cierra, cerrar | Cierra una aplicación | `cierra block` |
-| `window_list` | ventanas | Lista ventanas abiertas | `ventanas` |
-| `bring_to_front` | trae, muestra | Trae ventana al frente | `trae microsoft edge` |
-| `minimize` | minimiza | Minimiza una ventana | `minimiza calculadora` |
-| `help` | ayuda | Muestra ayuda | `ayuda` |
+| Comando | Ejemplo | Descripción |
+|---------|---------|-------------|
+| `open` | `open chrome` / `abre navegador` | Abre una aplicación |
+| `close` | `close calculator` / `cierra calculadora` | Cierra una aplicación |
+| `list` | `list` / `lista` | Lista aplicaciones disponibles |
+| `help` | `help` / `ayuda` | Muestra comandos disponibles |
+| `exit` | `exit` / `salir` | Cierra Diana |
+
+### Consultas Naturales
+
+Diana también responde preguntas en español o inglés:
+
+```
+You: ¿Qué es machine learning?
+Diana: Machine learning is a subset of artificial intelligence (AI) 
+       that focuses on developing algorithms...
+
+You: How do I learn Python?
+Diana: Here are some effective ways to learn Python:
+       1. Start with basics through online courses
+       2. Practice with small projects...
+```
 
 ---
 
-## 🔌 Integración de Módulos
+## 🔌 Módulos y Componentes
+
+### 1. Language Detector (`language_detector.py`)
+Detecta automáticamente el idioma de entrada usando `langdetect`.
+
+```python
+detector = LanguageDetector()
+lang, confidence = detector.detect_language("Hola")
+# Resultado: ("es", 0.98)
+```
+
+### 2. AI Processor (`ai_processor.py`)
+Procesa consultas naturales con Google Gemini, manteniendo contexto.
+
+```python
+processor = AIProcessor(api_key="...", model="gemini-2.0-flash")
+response = processor.process_input("Tell me about AI", "en")
+```
+
+### 3. Voice Handler (`voice_handler.py`)
+Convierte texto a voz usando ElevenLabs con múltiples voces.
+
+```python
+handler = VoiceHandler(api_key="...")
+handler.speak("Hello, I am Diana")
+```
+
+### 4. Command Processor (`command_processor.py`)
+Analiza y ejecuta comandos del sistema.
+
+```python
+processor = CommandProcessor(allowed_apps={...})
+result = processor.execute_command({"type": "open", "target": "notepad"})
+```
+
+---
+
+## 📖 Documentación Adicional
+
+- **[QUICK_START.md](QUICK_START.md)** - Guía rápida para empezar
+- **[DOCUMENTATION.md](DOCUMENTATION.md)** - Documentación completa y avanzada
+- **[test_diana.py](test_diana.py)** - Suite de pruebas para verificar funcionamiento
+
+---
+
+## 🔑 API Keys Requeridas
+
+### Google Gemini
+1. Ir a https://makersuite.google.com/app/apikey
+2. Crear nueva API key
+3. Copiar en el archivo `.env`
+
+### ElevenLabs (Opcional)
+1. Registrarse en https://elevenlabs.io
+2. Ir a API keys
+3. Copiar en el archivo `.env`
+4. Habilitar `USE_VOICE_OUTPUT = True` en config.py
 
 ### Acceder a Módulos Directamente (Programáticamente)
 
