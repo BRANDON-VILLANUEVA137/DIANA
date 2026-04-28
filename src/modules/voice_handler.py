@@ -3,6 +3,10 @@ Voice handling module for Diana
 Manages text-to-speech with ElevenLabs API
 """
 import logging
+import pygame
+import tempfile
+import os
+
 
 logger = logging.getLogger(__name__)
 
@@ -100,19 +104,23 @@ class VoiceHandler:
             }
     
     def play_audio(self, audio_bytes):
-        """
-        Play audio bytes
-        
-        Args:
-            audio_bytes (bytes): Audio data to play
-        """
         try:
-            # Note: The play function from elevenlabs expects a generator
-            # We need to convert bytes back to a generator-like format
             logger.info("Playing audio...")
-            # In practice, you might want to use a library like pydub or pygame
-            # For now, this is a placeholder for audio playback
-            
+
+            pygame.mixer.init()
+
+            with tempfile.NamedTemporaryFile(delete=False, suffix=".mp3") as f:
+                f.write(audio_bytes)
+                temp_path = f.name
+
+            pygame.mixer.music.load(temp_path)
+            pygame.mixer.music.play()
+
+            while pygame.mixer.music.get_busy():
+                continue
+
+            os.remove(temp_path)
+
         except Exception as e:
             logger.error(f"Error playing audio: {e}")
     

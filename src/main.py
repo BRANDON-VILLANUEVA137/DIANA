@@ -136,12 +136,13 @@ class DianaAssistant:
         # ==================== CHECK FOR NAME CHANGE COMMANDS ====================
         # Keywords for changing the assistant's name
         change_name_keywords = [
-            # English
-            "call me", "rename me", "change my name to", "change name to", "i want to call you",
-            "you can call me", "call yourself", "rename yourself", "my name is",
+             # English
+            "i want to call you", "rename yourself", "your name is now",
+            "i will call you", "you are now called",
+
             # Spanish
-            "llámame", "llamame", "cambia mi nombre", "renombra", "cambiar nombre a",
-            "puedes llamarme", "quiero llamarte", "te voy a llamar"
+            "quiero llamarte", "te voy a llamar", "tu nombre ahora es",
+            "ahora te llamas", "te llamaré"
         ]
         
         change_name_match = None

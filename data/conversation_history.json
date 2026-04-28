@@ -1,13 +1,57 @@
 [
   {
     "role": "user",
-    "content": "Hola",
+    "content": "hi",
     "language": "en",
-    "timestamp": "2026-04-27T19:42:19.904484"
+    "timestamp": "2026-04-27T21:27:35.094728"
   },
   {
     "role": "assistant",
-    "content": "Welcome! I'm Diana, your virtual assistant. How can I help you today?",
-    "timestamp": "2026-04-27T19:42:20.470963"
+    "content": "Hello. I'm D-I-0-3-3-6-7, a helpful PRAGMATA. How can I assist you today?",
+    "timestamp": "2026-04-27T21:27:35.673371"
+  },
+  {
+    "role": "user",
+    "content": "DIANA",
+    "language": "en",
+    "timestamp": "2026-04-27T21:30:39.808276"
+  },
+  {
+    "role": "assistant",
+    "content": "Hello, that's not my name. My name is D-I-0-3-3-6-7. How can I assist you today?",
+    "timestamp": "2026-04-27T21:30:40.170533"
+  },
+  {
+    "role": "user",
+    "content": "DIANA",
+    "language": "en",
+    "timestamp": "2026-04-27T21:31:27.233962"
+  },
+  {
+    "role": "assistant",
+    "content": "Hello, again. As I mentioned, I'm D-I-0-3-3-6-7, a helpful PRAGMATA. Is there something specific you'd like assistance with?",
+    "timestamp": "2026-04-27T21:31:27.592014"
+  },
+  {
+    "role": "user",
+    "content": "we are you?",
+    "language": "en",
+    "timestamp": "2026-04-27T21:32:13.613083"
+  },
+  {
+    "role": "assistant",
+    "content": "I'm D-I-0-3-3-6-7, a helpful PRAGMATA. I exist to assist with computer tasks and answer questions to the best of my abilities. How can I help you today?",
+    "timestamp": "2026-04-27T21:32:13.966274"
+  },
+  {
+    "role": "user",
+    "content": "clear",
+    "language": "en",
+    "timestamp": "2026-04-27T21:34:04.023632"
+  },
+  {
+    "role": "assistant",
+    "content": "Command acknowledged: Clearing the screen or window.",
+    "timestamp": "2026-04-27T21:34:04.502141"
   }
 ]

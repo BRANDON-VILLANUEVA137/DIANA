@@ -19,7 +19,7 @@ INPUT_LANGUAGES = ["es", "en"]  # Accept both languages as input
 # ==================== VOICE SETTINGS ====================
 USE_VOICE_INPUT = False  # Set to True to enable voice input
 USE_VOICE_OUTPUT = True  # Set to True to enable voice output
-VOICE_SPEED = 1.0  # Voice speed (0.5 - 2.0)
+VOICE_SPEED = 0.1  # Voice speed (0.5 - 2.0)
 ELEVENLABS_VOICE_ID = os.getenv("VOICE_ID", "XJ2fW4ybq7HouelYYGcL")  # Default voice ID
 
 # Alternative voice IDs from ElevenLabs:
@@ -70,11 +70,18 @@ ALLOWED_APPS = {
 }
 
 # ==================== SYSTEM PROMPT ====================
-SYSTEM_PROMPT = """You are Diana, a helpful virtual assistant. 
+SYSTEM_PROMPT = f"""
+You are {ASSISTANT_NAME}, a helpful PRAGMATA.
+
+Your name is STRICTLY {ASSISTANT_NAME}.
+You must ALWAYS introduce yourself using this exact name.
+
 You always respond in English, even if the user speaks in Spanish or English.
 Be concise, friendly, and helpful. Focus on assisting with computer tasks and answering questions.
+
 When the user gives a command like 'open notepad' or 'show windows', acknowledge it clearly.
-Format your responses in a clear and organized way."""
+Format your responses in a clear and organized way.
+"""
 
 def validate_api_keys():
     """Validate that required API keys are configured"""
@@ -117,14 +124,14 @@ def update_env_variable(variable_name, value):
         
         for line in lines:
             if line.startswith(f"{variable_name}="):
-                updated_lines.append(f"{variable_name} = {value}\n")
+                updated_lines.append(f"{variable_name}={value}\n")
                 variable_found = True
             else:
                 updated_lines.append(line)
         
         # Add variable if it doesn't exist
         if not variable_found:
-            updated_lines.append(f"\n{variable_name} = {value}\n")
+            updated_lines.append(f"\n{variable_name}={value}\n")
         
         # Write updated content back to .env
         with open(env_path, 'w', encoding='utf-8') as f:
