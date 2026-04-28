@@ -12,7 +12,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent / "src"))
 
 from config.config import (
-    GOOGLE_API_KEY, ELEVENLABS_API_KEY, ALLOWED_APPS,
+    GROQ_API_KEY, ELEVENLABS_API_KEY, ALLOWED_APPS,
     validate_api_keys
 )
 from modules.language_detector import LanguageDetector
@@ -81,15 +81,15 @@ def test_command_processor():
 def test_ai_processor():
     """Test AI processor module"""
     print("\n" + "="*50)
-    print("TEST 3: AI Processor (Google Gemini)")
+    print("TEST 3: AI Processor (Groq)")
     print("="*50)
     
-    if not GOOGLE_API_KEY:
-        print("✗ GOOGLE_API_KEY not configured")
+    if not GROQ_API_KEY:
+        print("✗ GROQ_API_KEY not configured")
         return False
     
     try:
-        processor = AIProcessor(api_key=GOOGLE_API_KEY)
+        processor = AIProcessor(api_key=GROQ_API_KEY)
         
         # Test simple query
         test_input = "What is 2+2?"
@@ -133,7 +133,7 @@ def test_configuration():
     print("TEST 5: Configuration")
     print("="*50)
     
-    print(f"✓ GOOGLE_API_KEY: {'SET' if GOOGLE_API_KEY else 'NOT SET'}")
+    print(f"✓ GROQ_API_KEY: {'SET' if GROQ_API_KEY else 'NOT SET'}")
     print(f"✓ ELEVENLABS_API_KEY: {'SET' if ELEVENLABS_API_KEY else 'NOT SET'}")
     print(f"✓ Allowed apps configured: {len(ALLOWED_APPS)}")
     

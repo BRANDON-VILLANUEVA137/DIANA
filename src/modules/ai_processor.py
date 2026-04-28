@@ -1,23 +1,24 @@
 """
 AI Processing module for Diana
-Handles Google Gemini API integration for natural language processing
+Handles Groq API integration for natural language processing
 """
 import json
 import logging
+import time
 from datetime import datetime
-import google.generativeai as genai
+from groq import Groq
 
 logger = logging.getLogger(__name__)
 
 class AIProcessor:
-    """Process natural language using Google Gemini"""
+    """Process natural language using Groq"""
     
-    def __init__(self, api_key, model="gemini-2.0-flash", system_prompt=""):
+    def __init__(self, api_key, model="llama-3.1-8b-instant", system_prompt=""):
         """
         Initialize AI Processor
         
         Args:
-            api_key (str): Google API key
+            api_key (str): Groq API key
             model (str): Model to use
             system_prompt (str): System prompt for the AI
         """
@@ -27,9 +28,8 @@ class AIProcessor:
         self.conversation_history = []
         self.max_history = 10
         
-        # Configure Gemini API
-        genai.configure(api_key=api_key)
-        self.model = genai.GenerativeModel(model)
+        # Configure Groq client
+        self.client = Groq(api_key=api_key)
         
         logger.info(f"AI Processor initialized with model: {model}")
     
@@ -57,19 +57,13 @@ class AIProcessor:
             if len(self.conversation_history) > self.max_history:
                 self.conversation_history = self.conversation_history[-self.max_history:]
             
-            # Prepare context from history
-            context = self._build_context()
+            # Build messages for Groq API
+            messages = self._build_messages(language)
             
-            # Create full prompt
-            full_prompt = f"{self.system_prompt}\n\nUser message (in {language}): {user_input}\n\nRespond in English only."
+            # Call Groq API with retry logic
+            response_text = self._call_groq_api(messages)
             
-            if context:
-                full_prompt = f"{context}\n\n{full_prompt}"
-            
-            # Call Gemini API
-            response = self.model.generate_content(full_prompt)
-            
-            if not response.text:
+            if not response_text:
                 return {
                     "success": False,
                     "content": "No response generated",
@@ -79,7 +73,7 @@ class AIProcessor:
             # Add assistant response to history
             self.conversation_history.append({
                 "role": "assistant",
-                "content": response.text,
+                "content": response_text,
                 "timestamp": datetime.now().isoformat()
             })
             
@@ -87,7 +81,7 @@ class AIProcessor:
             
             return {
                 "success": True,
-                "content": response.text,
+                "content": response_text,
                 "input_language": language,
                 "output_language": "en"
             }
@@ -100,20 +94,75 @@ class AIProcessor:
                 "error": str(e)
             }
     
-    def _build_context(self):
-        """Build context from conversation history"""
-        if len(self.conversation_history) < 2:
-            return ""
+    def _build_messages(self, language):
+        """Build messages list for Groq chat completions API"""
+        messages = []
         
-        # Get last few messages for context
-        recent_messages = self.conversation_history[-4:-1]  # Exclude current user message
+        # Add system prompt
+        system_content = self.system_prompt
+        if language:
+            system_content += f"\n\nThe user is writing in {language}. Respond in English only."
         
-        context = "Previous conversation context:"
-        for msg in recent_messages:
-            role = "User" if msg["role"] == "user" else "Assistant"
-            context += f"\n{role}: {msg['content'][:100]}..."  # Truncate for brevity
+        messages.append({
+            "role": "system",
+            "content": system_content
+        })
         
-        return context
+        # Add conversation history (only role and content for API)
+        for msg in self.conversation_history:
+            messages.append({
+                "role": msg["role"],
+                "content": msg["content"]
+            })
+        
+        return messages
+    
+    def _call_groq_api(self, messages, max_retries=3):
+        """
+        Call Groq API with retry logic
+        
+        Args:
+            messages (list): List of message dicts for the API
+            max_retries (int): Maximum number of retry attempts
+            
+        Returns:
+            str: Generated response text
+        """
+        last_exception = None
+        
+        for attempt in range(1, max_retries + 1):
+            try:
+                logger.debug(f"Groq API call attempt {attempt}/{max_retries}")
+                
+                response = self.client.chat.completions.create(
+                    model=self.model_name,
+                    messages=messages,
+                    temperature=0.7,
+                    max_tokens=2048,
+                    timeout=30
+                )
+                
+                if response.choices and len(response.choices) > 0:
+                    content = response.choices[0].message.content
+                    if content:
+                        return content.strip()
+                
+                logger.warning("Empty response from Groq API")
+                return ""
+                
+            except Exception as e:
+                last_exception = e
+                logger.warning(f"Groq API attempt {attempt} failed: {e}")
+                
+                if attempt < max_retries:
+                    wait_time = 2 ** attempt  # Exponential backoff: 2, 4, 8 seconds
+                    logger.info(f"Retrying in {wait_time} seconds...")
+                    time.sleep(wait_time)
+                else:
+                    logger.error(f"All {max_retries} attempts failed. Last error: {e}")
+        
+        # If we get here, all retries failed
+        raise last_exception if last_exception else Exception("Unknown API error")
     
     def clear_history(self):
         """Clear conversation history"""
@@ -145,3 +194,4 @@ class AIProcessor:
         except Exception as e:
             logger.error(f"Error loading history: {e}")
             return False
+

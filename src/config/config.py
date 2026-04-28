@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # ==================== API KEYS ====================
-GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY", "")
+GROQ_API_KEY = os.getenv("GROQ_API_KEY", "")
 ELEVENLABS_API_KEY = os.getenv("ELEVENLABS_API_KEY", "")
 
 # ==================== LANGUAGE SETTINGS ====================
@@ -28,7 +28,7 @@ ELEVENLABS_VOICE_ID = os.getenv("VOICE_ID", "XJ2fW4ybq7HouelYYGcL")  # Default v
 # - "9BWtsMINqrJLrRacOk9Q" - Aria (female)
 
 # ==================== AI SETTINGS ====================
-AI_MODEL = "gemini-2.0-flash"  # Google Gemini model
+AI_MODEL = "llama-3.1-8b-instant"  # Groq model
 AI_TEMPERATURE = 0.7  # Creativity level (0.0 - 1.0)
 MAX_HISTORY = 10  # Keep last N messages in context
 
@@ -78,8 +78,8 @@ Format your responses in a clear and organized way."""
 
 def validate_api_keys():
     """Validate that required API keys are configured"""
-    if not GOOGLE_API_KEY:
-        print("⚠️  WARNING: GOOGLE_API_KEY not set. Set it in .env file")
+    if not GROQ_API_KEY:
+        print("⚠️  WARNING: GROQ_API_KEY not set. Set it in .env file")
         return False
     if USE_VOICE_OUTPUT and not ELEVENLABS_API_KEY:
         print("⚠️  WARNING: ELEVENLABS_API_KEY not set. Voice output disabled.")

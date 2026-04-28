@@ -3,6 +3,11 @@
     "role": "user",
     "content": "Hola",
     "language": "en",
-    "timestamp": "2026-04-27T16:07:33.925415"
+    "timestamp": "2026-04-27T19:42:19.904484"
+  },
+  {
+    "role": "assistant",
+    "content": "Welcome! I'm Diana, your virtual assistant. How can I help you today?",
+    "timestamp": "2026-04-27T19:42:20.470963"
   }
 ]

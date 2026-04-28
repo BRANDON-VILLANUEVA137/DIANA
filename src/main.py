@@ -17,7 +17,7 @@ init(autoreset=True)
 sys.path.insert(0, str(Path(__file__).parent))
 
 from config.config import (
-    GOOGLE_API_KEY, ELEVENLABS_API_KEY, SYSTEM_PROMPT,
+    GROQ_API_KEY, ELEVENLABS_API_KEY, SYSTEM_PROMPT,
     USE_VOICE_INPUT, USE_VOICE_OUTPUT, ALLOWED_APPS,
     LOG_FILE, LOG_LEVEL, AI_MODEL, ASSISTANT_NAME, ASSISTANT_VERSION,
     DATA_FILE, ELEVENLABS_VOICE_ID, validate_api_keys, update_env_variable
@@ -55,7 +55,7 @@ class DianaAssistant:
         # Initialize components
         self.language_detector = LanguageDetector()
         self.ai_processor = AIProcessor(
-            api_key=GOOGLE_API_KEY,
+            api_key=GROQ_API_KEY,
             model=AI_MODEL,
             system_prompt=SYSTEM_PROMPT
         )
@@ -127,7 +127,7 @@ class DianaAssistant:
         
         # Check if asking for name
         if any(keyword in user_lower for keyword in name_question_keywords):
-            response = f"My name is {self.assistant_name}. I am a virtual assistant powered by Google Gemini and ElevenLabs. You can change my name anytime by saying 'call me [new name]'."
+            response = f"My name is {self.assistant_name}. I am a virtual assistant powered by Groq and ElevenLabs. You can change my name anytime by saying 'call me [new name]'."
             print(f"{Fore.CYAN}{self.assistant_name}: {response}{Style.RESET_ALL}")
             if USE_VOICE_OUTPUT and self.voice_handler:
                 self.voice_handler.speak(response)
@@ -282,14 +282,14 @@ class DianaAssistant:
         
         # Test AI processor
         print(f"\n{Fore.YELLOW}2. Testing AI Processor:{Style.RESET_ALL}")
-        if GOOGLE_API_KEY:
+        if GROQ_API_KEY:
             test_response = self.ai_processor.process_input("Hello, who are you?", "en")
             if test_response["success"]:
                 print(f"   ✓ AI Response: {test_response['content'][:50]}...")
             else:
                 print(f"   ✗ AI Error: {test_response.get('error')}")
         else:
-            print(f"   ✗ Google API key not configured")
+            print(f"   ✗ Groq API key not configured")
         
         # Test voice handler
         print(f"\n{Fore.YELLOW}3. Testing Voice Handler:{Style.RESET_ALL}")
